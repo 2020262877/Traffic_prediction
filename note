@@ -1,0 +1,47 @@
+    # print(df[df.grid_2000m == '11S LT  41 33'].info())
+    # df['Week_Num'] = df['Weekday'].map({'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6, 'Sun': 7})
+    # plt.title('Accident cases in each week of grid'.format('11S LT  41 33'), color='grey')
+    # plt.xlabel('Weekday', color='grey')
+    # plt.ylabel('Hour', color='grey')
+    # sns.violinplot(x='Weekday', y='Hour',
+    #                data=df[df.grid_2000m == '11S LT  41 33'].sort_values(by='Week_Num'))
+    # sns.swarmplot(x='Weekday', y='Hour', data=df[df.grid_2000m == '11S LT  41 33'].sort_values(by='Week_Num'),
+    #               color="w",  marker='.', c='grey')
+    # plt.show()
+
+        # mons_name = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    # mons_nums = [0] * 12
+    # mons_temp = [0] * 12
+    # mons_humi = [0] * 12
+    #
+    # sel_col = ['Month', 'Temperature(F)', 'Humidity(%)', 'Weather_Condition']
+    # df_sel = df[sel_col].copy()
+    # #  丢弃有缺失值的行
+    # df_sel.dropna(subset=df_sel.columns[df_sel.isnull().mean() != 0], how='any', axis=0, inplace=True)
+    # df_sel.shape
+    #
+    # temp_group = df_sel.groupby('Month')['Temperature(F)'].sum()
+    # humi_group = df_sel.groupby('Month')['Humidity(%)'].sum()
+    # mons_group = df_sel.groupby('Month').size()
+    # weather_nums = df_sel.groupby('Weather_Condition').size()
+    # print(weather_nums)
+    #
+    # for i in range(12):
+    #     temps = temp_group[mons_name[i]]
+    #     humis = humi_group[mons_name[i]]
+    #     mons_nums[i] = mons_group[mons_name[i]]
+    #     mons_temp[i] = (temps / mons_nums[i] - 32) / 1.8
+    #     mons_humi[i] = humis / mons_nums[i]
+    #
+    # plt.subplot2grid((3, 3), (0, 0), colspan=4)
+    # plt.ylabel('Temperature (℃)')
+    # plt.plot(mons_name, mons_temp, ls='-', c='coral', marker='.', mfc='coral', mec='coral')
+    #
+    # plt.subplot2grid((3, 3), (1, 0), colspan=4)
+    # plt.ylabel('Humidity (%)')
+    # plt.plot(mons_name, mons_humi, ls='-', c='c', marker='.', mfc='c', mec='c')
+    #
+    # plt.subplot2grid((3, 3), (2, 0), colspan=4)
+    # plt.ylabel('Traffic Accidents')
+    # plt.plot(mons_name, mons_nums, ls='-', c='dimgray', marker='.', mfc='dimgray', mec='dimgray')
+    # plt.show()
