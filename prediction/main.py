@@ -16,7 +16,7 @@ import baselineModel as bm
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    df = pd.read_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\processed_dataset.csv')
+    df = pd.read_csv(r'D:\毕业设计\数据集\processed_dataset.csv')
     bm.main(df)
     # tfe.fun1(df)
     # tfe.fun2(df)
