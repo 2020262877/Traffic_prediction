@@ -50,8 +50,8 @@ def process(filepath_accident, filepath_census):
     # 事故持续时间（分钟）向上取整
     df['Time_Duration(min)'] = round((df['End_Time'] - df['Start_Time']) / np.timedelta64(1, 'm'))
 
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\datasets_2020.csv')
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\processed_us2021census.csv')
+    df.to_csv(r'D:\毕业设计\数据集\datasets_2020.csv')
+    df.to_csv(r'D:\毕业设计\数据集\processed_us2021census.csv')
 
 
 def datamining_usa(filepath, filepath2):
@@ -402,7 +402,7 @@ def grid_visual(filepath):
         df.loc[df[df.grid_3000m == grid_idx].index, 'p1_3000m'] = p1[:len(p)]
         df.loc[df[df.grid_3000m == grid_idx].index, 'p2_3000m'] = p2[:len(p)]
         df.loc[df[df.grid_3000m == grid_idx].index, 'p3_3000m'] = p3[:len(p)]
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\datasets_2020_Los_grids3.csv')
+    df.to_csv(r'D:\毕业设计\数据集\datasets_2020_Los_grids3.csv')
 
 
 def timestamp_add(filepath):
@@ -410,7 +410,7 @@ def timestamp_add(filepath):
     df['timestamp'] = [time.mktime(time.strptime(t, '%Y/%m/%d %H:%M')) for t in df.Start_Time]
 
     df = df.sort_values(by='timestamp')
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\datasets_2020_Los_grids3_timestamp.csv')
+    df.to_csv(r'D:\毕业设计\数据集\datasets_2020_Los_grids3_timestamp.csv')
 
 
 def add_seasons(filepath):
@@ -428,7 +428,7 @@ def add_seasons(filepath):
             seasons[x] = 'Fall'
     df['seasons'] = seasons
     df.info()
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\datasets_2020_Los_final.csv')
+    df.to_csv(r'D:\毕业设计\数据集\datasets_2020_Los_final.csv')
 
 
 def add_grid_no(filepath):
@@ -443,7 +443,7 @@ def add_grid_no(filepath):
     df['grid_3k_no'] = grid_no
     print(df.head(3))
     print(len(grids))
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\datasets_2020_Los_final.csv')
+    df.to_csv(r'D:\毕业设计\数据集\datasets_2020_Los_final.csv')
 
 
 def add_street_flag(filepath):
@@ -484,7 +484,7 @@ def add_street_flag(filepath):
 
     df['street_flag'] = street_flag
     print(df.head(3))
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\datasets_2020_Los_final2.csv')
+    df.to_csv(r'D:\毕业设计\数据集\datasets_2020_Los_final2.csv')
 
 
 def add_month_weekday_123(filepath):
@@ -493,7 +493,7 @@ def add_month_weekday_123(filepath):
     df['month_123'] = df['Month'].map(
         {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10,
          'Nov': 11, 'Dec': 12})
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\datasets_2020_final.csv')
+    df.to_csv(r'D:\毕业设计\数据集\datasets_2020_final.csv')
 
 
 def weather_mining(filepath):
