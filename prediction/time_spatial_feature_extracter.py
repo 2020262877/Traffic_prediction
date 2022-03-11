@@ -192,7 +192,7 @@ def every_x_minutes_visual(filepath, x=10):
 
     dff = pd.DataFrame({'Date_Start': date_arr, 'nums_{}min'.format(x): num_arr})
     print(dff.head(10))
-    dff.to_csv(r'D:\毕业设计\数据集\preprocessed-datasets\nums_every10min.csv')
+    dff.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\nums_every10min.csv')
 
 
 def every_3000m_visual(filepath):
@@ -210,7 +210,7 @@ def every_3000m_visual(filepath):
     dff = df.groupby(['grid_3000m', 'Year']).size()
     print(dff['11S LT  21 23'])
     # print(dff.head(10))
-    dff.to_csv(r'D:\毕业设计\数据集\preprocessed-datasets\nums_every3000m.csv')
+    dff.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\nums_every3000m.csv')
 
 
 if __name__ == "__main__":
