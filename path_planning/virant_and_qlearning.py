@@ -56,7 +56,7 @@ def main():
 
     start_time = datetime.now()
     for i in range(0, 5000):
-        if tree_expansion( uav, d_obs, s_obs, 1, 0.4):
+        if tree_expansion(uav, d_obs, s_obs, 1, 0.4):
             print('sampling points number: ' + str(i))
             break
 

@@ -24,7 +24,6 @@ warnings.filterwarnings('ignore')
 # pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_columns', None)
 shap.initjs()
-import PUAdapter
 
 
 def outliers_removing_test(df):
