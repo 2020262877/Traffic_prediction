@@ -2,9 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import sklearn.linear_model as lm
+from sklearn import ensemble
+import xgboost as xgb
 import seaborn as sns
 import tqdm
 from matplotlib import ticker
+from sklearn.cluster import KMeans
 from grid_process import LLtoUSNG
 import time
 
@@ -50,8 +53,8 @@ def process(filepath_accident, filepath_census):
     # 事故持续时间（分钟）向上取整
     df['Time_Duration(min)'] = round((df['End_Time'] - df['Start_Time']) / np.timedelta64(1, 'm'))
 
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\datasets_2020.csv')
-    df.to_csv(r'D:\毕业设计\github代码\1在看\preprocessed-datasets\processed_us2021census.csv')
+    df.to_csv(r'D:\毕业设计\数据集\preprocessed-datasets\datasets_2020.csv')
+    df.to_csv(r'D:\毕业设计\数据集\preprocessed-datasets\processed_us2021census.csv')
 
 
 def datamining_usa(filepath, filepath2):
@@ -510,7 +513,183 @@ def weather_mining(filepath):
     plt.show()
 
 
+def cluster_process(df, year=2020):
+    df = pd.read_csv(df)
+    city_name = 'Los Angeles'
+    # df = df[df.Year == year]
+
+    # ------ 3.构造K-Means聚类器 ------
+    n_clusters = 7  # 类簇的数量
+    estimator = KMeans(n_clusters)  # 构建聚类器
+
+    # ------ 4.训练K-Means聚类器 ------
+    dff = np.array(df[['Start_Lat', 'Start_Lng']])
+    estimator.fit(df[['Start_Lat', 'Start_Lng']])
+    cluster_centers = estimator.cluster_centers_
+    print(cluster_centers)  # 输出类簇中心
+
+    # ------ 5.数据可视化 ------
+    # markers = ['*', '+', '^', 's', 'x', 'v', 'o']  # 标记样式列表
+    colors = ['pink', 'm', 'c', 'y', 'b', 'g', 'orange']  # 标记颜色列表
+    labels = estimator.labels_  # 获取聚类标签
+    df['cluster_id'] = labels
+
+    # plt.title('Traffic Accidents of {} in {}'.format(city_name, year), color='grey')
+    plt.xlabel('Longitude', color='grey')
+    plt.ylabel('Latitude', color='grey')
+    for i in range(n_clusters):  # 遍历所有城市，绘制散点图
+        members = labels == i  # members是一个布尔型数组
+        plt.scatter(
+            dff[members, 1],  # 城市经度数组
+            dff[members, 0],  # 城市纬度数组
+            marker='+',  # 标记样式
+            c=colors[i]  # 标记颜色
+        )  # 绘制散点图
+
+    plt.scatter(x=cluster_centers[:, 1], y=cluster_centers[:, 0], c='r')
+    plt.show()
+    # df.to_csv(r'D:\毕业设计\数据集\datasets_2020_final_addCluster.csv')
+
+
+def feature_importance(filepath):
+    df = pd.read_csv(filepath)
+
+    feature_lst = ['Start_Lat', 'Start_Lng', 'Severity', 'Temperature(F)', 'Humidity(%)', 'Pressure(in)',
+                   'Visibility(mi)', 'Wind_Direction', 'Weather_Condition', 'Amenity', 'Bump', 'Crossing', 'Give_Way',
+                   'Junction', 'No_Exit', 'Railway', 'Roundabout', 'Station', 'Stop', 'Traffic_Calming',
+                   'Traffic_Signal', 'Turning_Loop', 'Timezone', 'Sunrise_Sunset', 'Year', 'month_123', 'weekday_123',
+                   'Hour', 'grid_3k_no', 'street_flag', 'cluster_id']
+
+    df = df[feature_lst].copy()
+
+    # Check missing values 空 -> true -> 1
+    df.isnull().mean()
+
+    #  丢弃有缺失值的行
+    df.dropna(subset=df.columns[df.isnull().mean() != 0], how='any', axis=0, inplace=True)
+    df.info()
+
+    for u in df.columns:
+        if df[u].dtype == bool:
+            df[u] = df[u].astype('int64')
+
+    train_y = df['Severity'].values
+    x_cols = [col for col in df.columns if col not in ['Severity'] if df[col].dtype in ['int64', 'float64']]
+    train_col = df[x_cols]
+
+    fearture_name = train_col.columns.values
+
+    model = ensemble.ExtraTreesRegressor(n_estimators=25, max_depth=30, max_features=0.3, n_jobs=-1, random_state=0)
+    model.fit(train_col, train_y)
+
+    # plot imp
+    importance = model.feature_importances_
+    std = np.std([tree.feature_importances_ for tree in model.estimators_], axis=0)
+    indices = np.argsort(importance)[::-1][:20]
+
+    plt.title("Feature importance", color='grey')
+    plt.bar(range(len(indices)), importance[indices], color="r", yerr=std[indices], align="center")
+    plt.xticks(range(len(indices)), fearture_name[indices], rotation=75)
+    plt.xlim([-1, len(indices)])
+    plt.subplots_adjust(bottom=0.25)
+    plt.show()
+
+
+def feature_importance2(filepath):
+    df = pd.read_csv(filepath)
+
+    feature_lst = ['Start_Lat', 'Start_Lng', 'Severity', 'Temperature(F)', 'Humidity(%)', 'Pressure(in)',
+                   'Visibility(mi)', 'Wind_Direction', 'Weather_Condition', 'Amenity', 'Bump', 'Crossing', 'Give_Way',
+                   'Junction', 'No_Exit', 'Railway', 'Roundabout', 'Station', 'Stop', 'Traffic_Calming',
+                   'Traffic_Signal', 'Turning_Loop', 'Timezone', 'Sunrise_Sunset', 'Year', 'month_123', 'weekday_123',
+                   'Hour', 'grid_3k_no', 'street_flag', 'cluster_id']
+
+    df = df[feature_lst].copy()
+
+    # Check missing values 空 -> true -> 1
+    df.isnull().mean()
+
+    #  丢弃有缺失值的行
+    df.dropna(subset=df.columns[df.isnull().mean() != 0], how='any', axis=0, inplace=True)
+    df.info()
+
+    for u in df.columns:
+        if df[u].dtype == bool:
+            df[u] = df[u].astype('int64')
+
+    train_y = df['Severity'].values
+    x_cols = [col for col in df.columns if col not in ['Severity'] if df[col].dtype in ['int64', 'float64']]
+    train_col = df[x_cols]
+
+    xgb_prames = {
+        'eta': 0.05,
+        'max_depth': 8,
+        'subsample': 0.7,
+        'colsample_bytree': 0.7,
+        'objective': 'reg:linear',
+        'silent': 0,
+        'seed': 0
+    }
+
+    dtrain = xgb.DMatrix(train_col, train_y, feature_names=train_col.columns.values)
+
+    model = xgb.train(dict(xgb_prames, silent=0), dtrain, num_boost_round=50)
+
+    fig, ax = plt.subplots()
+    xgb.plot_importance(model, max_num_features=50, height=0.8, ax=ax)
+    plt.title("Feature importance", color='grey')
+    plt.subplots_adjust(left=0.18)
+    plt.show()
+
+
+def correlation_analysis(filepath):
+    feature_lst = ['Start_Lat', 'Start_Lng', 'Severity', 'Temperature(F)', 'Humidity(%)', 'Pressure(in)',
+                   'Visibility(mi)', 'Junction', 'Traffic_Signal', 'Year', 'month_123', 'weekday_123',
+                   'Hour', 'grid_3k_no', 'street_flag', 'cluster_id']
+    df = pd.read_csv(filepath)
+    df = df[feature_lst].copy()
+
+    # Check missing values 空 -> true -> 1
+    df.isnull().mean()
+
+    #  丢弃有缺失值的行
+    df.dropna(subset=df.columns[df.isnull().mean() != 0], how='any', axis=0, inplace=True)
+    df.info()
+
+    for u in df.columns:
+        if df[u].dtype == bool:
+            df[u] = df[u].astype('int64')
+
+    x_cols = [col for col in df.columns if col not in ['Severity'] if df[col].dtype in ['float64', 'int64']]
+
+    labels = []
+    values = []
+    for col in x_cols:
+        labels.append(col)
+        values.append(np.corrcoef(df[col].values, df.Severity.values)[0, 1])
+
+    corr_df = pd.DataFrame({'col_labels': labels, 'corr_values': values})
+    corr_df = corr_df.sort_values(by='corr_values')
+
+    ind = np.arange(len(labels))
+    width = 0.9
+    fig, ax = plt.subplots()
+    rects = ax.barh(ind, np.array(corr_df.corr_values.values), color='y')
+    plt.subplots_adjust(left=0.20)
+    ax.set_yticks(ind)
+    ax.set_yticklabels(corr_df.col_labels.values, rotation='horizontal')
+    ax.set_xlabel("Correlation coefficient", color='grey')
+    ax.set_title("Correlation coefficient of the variables", color='grey')
+    plt.show()
+
+    fig = plt.gcf()
+    fig.set_size_inches(20, 20)
+    fig = sns.heatmap(df.corr(), annot=True, linewidths=1, linecolor='k', square=True, mask=False, vmin=-1, vmax=1,
+                      cbar_kws={"orientation": "vertical"}, cbar=True)
+    plt.show()
+
+
 if __name__ == "__main__":
-    df = r'D:\毕业设计\数据集\datasets_2020_Los_final.csv'
-    day_analysis(df)
+    df = r'D:\毕业设计\数据集\datasets_2020_Los_final_addCluster.csv'
+    correlation_analysis(df)
     # df = pd.read_csv(df)
